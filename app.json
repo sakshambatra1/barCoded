@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "barCoded",
+    "scheme": "barCoded",
     "slug": "barCoded",
     "version": "1.0.0",
     "orientation": "portrait",
