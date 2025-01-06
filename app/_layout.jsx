@@ -30,6 +30,8 @@ const RootLayout = () => {
     <Stack>
       <Stack.Screen name= "index" options={{headerShown:
         false}}/>
+      <Stack.Screen name= "(auth)/sign-in" options={{headerShown:
+        false}}/>
     </Stack>
   )
 

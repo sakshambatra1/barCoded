@@ -9,7 +9,7 @@ export default function App() {
   const router = useRouter();
 
   return (
-    <SafeAreaView style={{ backgroundColor: '#000000', height: '100%' }}>
+    <SafeAreaView style={{ backgroundColor: '#242424', height: '100%' }}>
       <ScrollView contentContainerStyle={{ height: '100%' }}>
         <View style={{ width: '100%', justifyContent: 'center', alignItems: 'center' }}>
           <Image 
