@@ -1,2 +1,0 @@
-# barCoded
-barcoded gui.
