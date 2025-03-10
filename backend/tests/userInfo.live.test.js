@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:5000'; // URL of your running server
+const BASE_URL = 'http://localhost:5000'; 
 
 describe('Live API Tests (Using fetch)', () => {
 
@@ -55,7 +55,7 @@ describe('Live API Tests (Using fetch)', () => {
     expect(response.status).toBe(200);
     expect(responseData).toHaveProperty('success', 'Data added successfully');
   });
-
+  
   it('should handle XSS attack input', async () => {
     const response = await fetch(`${BASE_URL}/api/userInfo/addUserInfo`, {
       method: 'POST',
