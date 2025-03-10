@@ -1,5 +1,5 @@
 const express = require('express');
-const {register,verifyEmail} = require('../controllers/authController');
+const {register,verifyEmail,login} = require('../controllers/authController');
 const rateLimit = require('express-rate-limit');
 const router = express.Router();
 
@@ -10,6 +10,7 @@ const registrationLimiter = rateLimit({
 });
 
 router.post('/register', registrationLimiter, register);
+router.post('/login', login);
 router.post('/verify-email', verifyEmail);
 
 module.exports = router;

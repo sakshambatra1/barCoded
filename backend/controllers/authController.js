@@ -150,8 +150,8 @@ const verifyEmail = async (req, res) => {
 
         res.status(200).json({
             response: "Success",
-            accessToken,
-            refreshToken
+            accessToken: accessToken,
+            refreshToken: refreshToken
         });
 
     } catch (error) {
@@ -160,5 +160,32 @@ const verifyEmail = async (req, res) => {
     }
 };
 
+const login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const result = await pool.query('SELECT "Password" FROM public."Users" WHERE "Email"= $1', [email]);
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: "User not found" });
+        }
 
-export { register, verifyEmail };
+        const isValid = await bcrypt.compare(String(password), String(result.rows[0].Password));
+        
+        if (isValid) {
+            let accessToken = createAccessToken(email);
+            let refreshToken = createRefreshToken(email);
+
+            await pool.query('UPDATE public."Users" SET "refreshToken" = $1 WHERE "Email" = $2', [refreshToken, email]);
+
+            return res.status(200).json({ accessToken, refreshToken });
+        } else {
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+
+export { register, verifyEmail, login };
