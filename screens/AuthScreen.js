@@ -20,7 +20,6 @@ export default function AuthScreen({ navigation }) {
   };
 
   const handleLogin = async () => {
-    // Validate email format for login
     if (!validateEmail(email)) {
       Alert.alert("Invalid Email", "Please enter a valid email address.");
       return;

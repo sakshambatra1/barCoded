@@ -97,7 +97,7 @@ async function checkKey(email, key){
         const isValid = await bcrypt.compare(String(key), result.rows[0]["Key"]);
         if(isValid){
             try {
-                const result = await pool.query('DELETE FROM "VerificationKeys" WHERE "Key"=$1', [key]);
+                await pool.query('DELETE FROM "VerificationKeys" WHERE "Key"=$1', [key]);
                 return true;
             } catch (error) {
                 console.error('Error deleting row from table:', error);
@@ -116,7 +116,7 @@ async function storeUser(email, password, refreshToken) {
     try {
         const hashedPassword = await bcrypt.hash(password, parseInt(SALTROUNDS));
 
-        const result = await pool.query('INSERT into public."Users" ("ID", "Email", "Password", "refreshToken") VALUES ($1, $2, $3, $4)', [uuidv4(), email, hashedPassword, refreshToken]);
+        await pool.query('INSERT into public."Users" ("ID", "Email", "Password", "refreshToken") VALUES ($1, $2, $3, $4)', [uuidv4(), email, hashedPassword, refreshToken]);
         return refreshToken;
     } catch (error) {
         console.error('Error storing user information:', error);
