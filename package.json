@@ -19,6 +19,7 @@
     "bcryptjs": "^3.0.2",
     "cookie-parser": "^1.4.7",
     "expo": "~52.0.25",
+    "expo-secure-store": "^14.0.1",
     "expo-status-bar": "~2.0.1",
     "express": "^4.21.2",
     "express-rate-limit": "^7.5.0",
