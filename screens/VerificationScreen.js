@@ -17,7 +17,7 @@ export default function VerificationScreen({ route, navigation }) {
       });
       const data = await response.json();
       if (response.ok && data.response === "Success") {
-        await login(data.refreshToken);
+        await login(data.refreshToken, email);
       } else {
         Alert.alert('Verification Failed', data.response || 'Invalid verification code.');
       }

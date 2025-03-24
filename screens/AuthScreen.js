@@ -33,7 +33,7 @@ export default function AuthScreen({ navigation }) {
       });
       const data = await response.json();
       if (response.ok) {
-        await login(data.refreshToken);
+        await login(data.refreshToken, email);
       } else {
         Alert.alert('Login Failed', data.message || 'Invalid credentials');
       }
@@ -44,7 +44,6 @@ export default function AuthScreen({ navigation }) {
   };
 
   const handleRegister = async () => {
-    // Validate email and password for registration
     if (!validateEmail(email)) {
       Alert.alert("Invalid Email", "Please enter a valid email address.");
       return;
