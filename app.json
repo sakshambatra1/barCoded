@@ -1,5 +1,6 @@
 {
   "expo": {
+    "jsEngine":"jsc",
     "name": "barCoded",
     "slug": "barCoded",
     "version": "1.0.0",

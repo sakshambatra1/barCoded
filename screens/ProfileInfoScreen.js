@@ -5,7 +5,7 @@ import {
   KeyboardAvoidingView, Platform, ScrollView, SafeAreaView 
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useAuth } from '../context/AuthContext';  // Import the AuthContext
+import { useAuth } from '../context/AuthContext';  
 
 export default function ProfileInfoScreen({ navigation }) {
   const [name, setName] = useState('');
@@ -18,7 +18,7 @@ export default function ProfileInfoScreen({ navigation }) {
   const [selectedSex, setSelectedSex] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  const { userEmail } = useAuth();  // Get the email from context
+  const { userEmail } = useAuth();  
 
   const healthConditions = ['Yes', 'No'];
   const sexes = ['Male', 'Female'];
@@ -49,7 +49,6 @@ export default function ProfileInfoScreen({ navigation }) {
     return `${day}/${month}/${year}`;
   };
 
-  // Fetch user information when the component first mounts.
   useEffect(() => {
     if (userEmail) {
       const fetchUserInfo = async () => {
