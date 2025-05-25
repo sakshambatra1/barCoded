@@ -7,9 +7,11 @@ import os
 from dotenv import load_dotenv
 import logging
 import re
+import struct
 
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
 
+# Config stuff
 DEVICE_ADDRESS = os.getenv("DEVICE_ADDRESS")
 SERVICE_UUID   = os.getenv("SERVICE_UUID", "").lower()
 CHAR_UUID      = os.getenv("CHAR_UUID", "").lower()
@@ -19,29 +21,27 @@ if not all([DEVICE_ADDRESS, SERVICE_UUID, CHAR_UUID]):
         "Make sure DEVICE_ADDRESS, SERVICE_UUID and CHAR_UUID are set in your .env"
     )
 
+# Pydantic model for typesafety
 class IMUReading(BaseModel):
     accel_x: float
     accel_y: float
     accel_z: float
-    gyro_x:  float
-    gyro_y:  float
-    gyro_z:  float
+    quat_w: float
+    quat_x: float
+    quat_y: float
+    quat_z: float
 
 latest: IMUReading | None = None
 
 def imu_notification_handler(_: int, data: bytearray):
     global latest
-    s = data.decode(errors="ignore")
-    nums = re.findall(r"[-+]?\d*\.\d+|\d+", s)
-    if len(nums) < 2:
-        return
-    disp, reps = map(float, nums[:2])
-    # pack those into the same model (or create a new Pydantic model)
+    # data should be 28 bytes, because we're sending 4 float (this is just for safety ithinsk)
+    if len(data) != 28:
+        return "Wrong size of data sent"
+    ax, ay, az, qw, qx, qy, qz = struct.unpack('<7f', bytes(data))
     latest = IMUReading(
-       accel_x=disp,   # repurpose fields—or define new ones
-       accel_y=reps,
-       accel_z=0,      # fill zeros
-       gyro_x=0, gyro_y=0, gyro_z=0
+        accel_x=ax, accel_y=ay, accel_z=az,
+        quat_w=qw, quat_x=qx, quat_y=qy, quat_z=qz
     )
 
 app = FastAPI()
@@ -76,6 +76,7 @@ async def _keep_connected(client: BleakClient):
             logging.info("Re-subscribed to notifications")
         await asyncio.sleep(5)
 
+#Endpoint for recieving latest data
 @app.get("/imu/latest", response_model=IMUReading)
 async def get_latest_imu():
     if latest is None:
