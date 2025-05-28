@@ -1,4 +1,3 @@
-// src/screens/VerificationScreen.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { useAuth } from '../context/AuthContext';
@@ -18,7 +17,7 @@ export default function VerificationScreen({ route, navigation }) {
       const data = await response.json();
       if (response.ok && data.response === "Success") {
         await login(data.refreshToken, email);
-        navigation.navigate('Profile', { fromRegister: true });
+        navigation.navigate('ProfileSetup', { fromRegister: true });
       }
        else {
         Alert.alert('Verification Failed', data.response || 'Invalid verification code.');
