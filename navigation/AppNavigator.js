@@ -1,5 +1,4 @@
-// src/navigation/AppNavigator.js
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import AuthScreen from '../screens/AuthScreen';
@@ -14,7 +13,24 @@ import { useAuth } from '../context/AuthContext';
 const Stack = createStackNavigator();
 
 export default function AppNavigator() {
-  const { refreshToken, isLoading } = useAuth();
+  const { refreshToken, isLoading, logout, userEmail } = useAuth();
+
+  useEffect(() => {
+    const validateSession = async () => {
+      if (refreshToken && userEmail) {
+        try {
+          const response = await fetch(`http://10.0.0.132:5000/api/auth/check-session?email=${encodeURIComponent(userEmail)}`);
+          if (!response.ok) {
+            logout();
+          }
+        } catch (error) {
+          console.error('Validation error:', error);
+          logout();
+        }
+      }
+    };
+    validateSession();
+  }, [refreshToken, userEmail, logout]);
 
   if (isLoading) {
     return (
@@ -30,12 +46,12 @@ export default function AppNavigator() {
         <>
           <Stack.Screen name="Auth" component={AuthScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Verification" component={VerificationScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="Profile" component={ProfileInfoScreen} options={{ headerShown: false }} />
         </>
       ) : (
         <>
-          <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="Profile" component={ProfileInfoScreen} options={{ headerShown: false }} />
           <Stack.Screen name="WorkoutInput" component={WorkoutInputScreen} options={{ title: 'Workout Input' }} />
+          <Stack.Screen name="Profile" component={ProfileInfoScreen} options={{ headerShown: false }} />
           <Stack.Screen name="DifficultyScale" component={DifficultyScaleScreen} options={{ title: 'Difficulty Scale' }} />
           <Stack.Screen name="MetricsDashboard" component={MetricsDashboardScreen} options={{ title: 'Metrics Dashboard' }} />
         </>

@@ -5,9 +5,10 @@ import {
   KeyboardAvoidingView, Platform, ScrollView, SafeAreaView 
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useAuth } from '../context/AuthContext';  
+import { useAuth } from '../context/AuthContext';
 
-export default function ProfileInfoScreen({ navigation }) {
+export default function ProfileInfoScreen({ route, navigation }) {
+  const fromRegister = route?.params?.fromRegister || false;
   const [name, setName] = useState('');
   const [weight, setWeight] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState(null);
@@ -18,7 +19,7 @@ export default function ProfileInfoScreen({ navigation }) {
   const [selectedSex, setSelectedSex] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  const { userEmail } = useAuth();  
+  const { userEmail } = useAuth();
 
   const healthConditions = ['Yes', 'No'];
   const sexes = ['Male', 'Female'];
@@ -73,10 +74,11 @@ export default function ProfileInfoScreen({ navigation }) {
       fetchUserInfo();
     }
   }, [userEmail]);
+  
 
   const handleSave = async () => {
+    
     const errors = [];
-
     if (!name.trim()) errors.push("Name is required.");
     if (!weight.trim()) errors.push("Weight is required.");
     if (!dateOfBirth) errors.push("Date of Birth is required.");
@@ -101,14 +103,13 @@ export default function ProfileInfoScreen({ navigation }) {
       Alert.alert("Validation Errors", errors.join("\n"));
       return;
     }
-
+    console.log("Before isSaving: " + userEmail);
     setIsSaving(true);
+    console.log("After isSaving: "+ userEmail);
     try {
       const response = await fetch('http://10.0.0.132:5000/api/userInfo/addUserInfo', {
         method: "POST",
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: userEmail,
           username: name,
@@ -125,7 +126,7 @@ export default function ProfileInfoScreen({ navigation }) {
         Alert.alert("Error", data.error || "An error occurred while saving your profile.");
       } else {
         Alert.alert("Profile Saved", "Your profile has been successfully saved.", [
-          { text: "OK", onPress: () => navigation.navigate('Home') }
+          { text: "OK", onPress: () => navigation.navigate('WorkoutInput') }
         ]);
       }
     } catch (error) {
@@ -137,84 +138,34 @@ export default function ProfileInfoScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.keyboardAvoidingView}
-      >
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.keyboardAvoidingView}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <Text style={styles.header}>Fitness Profile Page</Text>
 
           <Text style={styles.label}>Name</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your name"
-            value={name}
-            onChangeText={setName}
-            accessibilityLabel="Name Input"
-            autoCapitalize="words"
-          />
+          <TextInput style={styles.input} placeholder="Enter your name" value={name} onChangeText={setName} />
 
           <Text style={styles.label}>Weight (kg)</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your weight in kg"
-            keyboardType="numeric"
-            value={weight}
-            onChangeText={setWeight}
-            accessibilityLabel="Weight Input"
-          />
+          <TextInput style={styles.input} placeholder="Enter your weight in kg" keyboardType="numeric" value={weight} onChangeText={setWeight} />
 
           <View style={styles.fieldContainer}>
             <Text style={styles.label}>Date of Birth</Text>
-            <TouchableOpacity
-              style={styles.dateInput}
-              onPress={() => setShowDatePicker(true)}
-              accessibilityLabel="Date of Birth Input"
-            >
-              <Text style={dateOfBirth ? styles.dateText : styles.placeholderText}>
-                {dateOfBirth ? formatDate(dateOfBirth) : 'Select your date of birth'}
-              </Text>
+            <TouchableOpacity style={styles.dateInput} onPress={() => setShowDatePicker(true)}>
+              <Text style={dateOfBirth ? styles.dateText : styles.placeholderText}>{dateOfBirth ? formatDate(dateOfBirth) : 'Select your date of birth'}</Text>
             </TouchableOpacity>
             {showDatePicker && (
-              <DateTimePicker
-                testID="dateTimePicker"
-                value={dateOfBirth || new Date(2000, 0, 1)}
-                mode="date"
-                display="default"
-                maximumDate={new Date()}
-                onChange={handleDateChange}
-              />
+              <DateTimePicker testID="dateTimePicker" value={dateOfBirth || new Date(2000, 0, 1)} mode="date" display="default" maximumDate={new Date()} onChange={handleDateChange} />
             )}
           </View>
 
           <Text style={styles.label}>Sport</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter the sport you play"
-            value={sport}
-            onChangeText={setSport}
-            accessibilityLabel="Sport Input"
-            autoCapitalize="words"
-          />
+          <TextInput style={styles.input} placeholder="Enter the sport you play" value={sport} onChangeText={setSport} />
 
           <Text style={styles.label}>Health Condition</Text>
           <View style={styles.selectionContainer}>
             {healthConditions.map((condition) => (
-              <TouchableOpacity
-                key={condition}
-                style={[
-                  styles.option, 
-                  selectedHealthCondition === condition && styles.selectedOption
-                ]}
-                onPress={() => setSelectedHealthCondition(condition)}
-                accessibilityLabel={`Select Health Condition ${condition}`}
-              >
-                <Text style={[
-                  styles.optionText, 
-                  selectedHealthCondition === condition && styles.selectedOptionText
-                ]}>
-                  {condition}
-                </Text>
+              <TouchableOpacity key={condition} style={[styles.option, selectedHealthCondition === condition && styles.selectedOption]} onPress={() => setSelectedHealthCondition(condition)}>
+                <Text style={[styles.optionText, selectedHealthCondition === condition && styles.selectedOptionText]}>{condition}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -222,45 +173,21 @@ export default function ProfileInfoScreen({ navigation }) {
           <Text style={styles.label}>Sex</Text>
           <View style={styles.selectionContainer}>
             {sexes.map((sex) => (
-              <TouchableOpacity
-                key={sex}
-                style={[
-                  styles.option, 
-                  selectedSex === sex && styles.selectedOption
-                ]}
-                onPress={() => setSelectedSex(sex)}
-                accessibilityLabel={`Select Sex ${sex}`}
-              >
-                <Text style={[
-                  styles.optionText, 
-                  selectedSex === sex && styles.selectedOptionText
-                ]}>
-                  {sex}
-                </Text>
+              <TouchableOpacity key={sex} style={[styles.option, selectedSex === sex && styles.selectedOption]} onPress={() => setSelectedSex(sex)}>
+                <Text style={[styles.optionText, selectedSex === sex && styles.selectedOptionText]}>{sex}</Text>
               </TouchableOpacity>
             ))}
           </View>
 
           <View style={styles.buttonContainer}>
-            <TouchableOpacity 
-              style={styles.cancelButton} 
-              onPress={() => navigation.goBack()}
-              disabled={isSaving}
-              accessibilityLabel="Cancel Button"
-            >
-              <Text style={styles.cancelButtonText}>Cancel</Text>
+            <TouchableOpacity style={[styles.cancelButton, fromRegister && styles.disabledButton]} onPress={() => navigation.goBack()} disabled={fromRegister || isSaving}>
+              <Text style={[styles.cancelButtonText, fromRegister && { color: '#999' }]}>Cancel</Text>
             </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.saveButton, isSaving && styles.disabledButton]} 
-              onPress={handleSave}
-              disabled={isSaving}
-              accessibilityLabel="Save Button"
-            >
-              <Text style={styles.saveButtonText}>
-                {isSaving ? "Saving..." : "Save"}
-              </Text>
+            <TouchableOpacity style={[styles.saveButton, isSaving && styles.disabledButton]} onPress={handleSave} disabled={isSaving}>
+              <Text style={styles.saveButtonText}>{isSaving ? "Saving..." : "Save"}</Text>
             </TouchableOpacity>
           </View>
+
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
