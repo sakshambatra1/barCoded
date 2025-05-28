@@ -18,7 +18,9 @@ export default function VerificationScreen({ route, navigation }) {
       const data = await response.json();
       if (response.ok && data.response === "Success") {
         await login(data.refreshToken, email);
-      } else {
+        navigation.navigate('Profile', { fromRegister: true });
+      }
+       else {
         Alert.alert('Verification Failed', data.response || 'Invalid verification code.');
       }
     } catch (error) {

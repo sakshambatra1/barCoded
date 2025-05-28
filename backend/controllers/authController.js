@@ -21,6 +21,25 @@ async function checkEmailExists(email) {
     }
 }
 
+const checkSession = async (req, res) => {
+    const { email } = req.query;
+    if (!email) {
+        return res.status(400).json({ error: "Email is required for session check" });
+    }
+    try {
+        const userExists = await checkEmailExists(email);
+        if (userExists) {
+            return res.status(200).json({ message: "Session valid, user exists" });
+        } else {
+            return res.status(404).json({ error: "User not found, session invalid" });
+        }
+    } catch (error) {
+        console.error("Error during session check:", error);
+        return res.status(500).json({ error: "Internal Server Error during session check" });
+    }
+};
+
+
 async function createKey(email) {
     let exists; 
     try {
@@ -188,4 +207,4 @@ const login = async (req, res) => {
 };
 
 
-export { register, verifyEmail, login };
+export { register, verifyEmail, login, checkSession };
