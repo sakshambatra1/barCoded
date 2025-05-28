@@ -13,7 +13,8 @@
   "dependencies": {
     "@react-native-community/datetimepicker": "^8.2.0",
     "@react-native-masked-view/masked-view": "^0.3.2",
-    "@react-navigation/native": "^7.0.14",
+    "@react-navigation/drawer": "^7.3.12",
+    "@react-navigation/native": "^7.1.9",
     "@react-navigation/stack": "^7.1.1",
     "@sendgrid/mail": "^8.1.4",
     "barcoded": "file:",
@@ -30,8 +31,8 @@
     "react-native": "0.79.2",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-reanimated": "^3.16.7",
-    "react-native-safe-area-context": "^5.1.0",
-    "react-native-screens": "^4.5.0",
+    "react-native-safe-area-context": "^5.4.1",
+    "react-native-screens": "^4.11.0",
     "react-native-vector-icons": "^10.2.0",
     "uuid": "^11.0.5",
     "uuidv4": "^6.2.13"

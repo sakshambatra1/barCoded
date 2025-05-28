@@ -1,4 +1,3 @@
-// src/screens/MetricsDashboardScreen.js
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 

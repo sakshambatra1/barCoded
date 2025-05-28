@@ -1,4 +1,3 @@
-// src/screens/AuthScreen.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { useAuth } from '../context/AuthContext';

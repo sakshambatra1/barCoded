@@ -1,16 +1,90 @@
 import React, { useEffect } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, View, Button, StyleSheet, Text } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
+import { useAuth } from '../context/AuthContext';
+
 import AuthScreen from '../screens/AuthScreen';
 import VerificationScreen from '../screens/VerificationScreen';
-import HomeScreen from '../screens/HomeScreen';
 import ProfileInfoScreen from '../screens/ProfileInfoScreen';
 import WorkoutInputScreen from '../screens/WorkoutInputScreen';
 import DifficultyScaleScreen from '../screens/DifficultyScaleScreen';
 import MetricsDashboardScreen from '../screens/MetricsDashboardScreen';
-import { useAuth } from '../context/AuthContext';
 
 const Stack = createStackNavigator();
+const Drawer = createDrawerNavigator();
+
+function CustomDrawerContent(props) {
+  const { logout } = useAuth();
+  return (
+    <DrawerContentScrollView {...props}>
+      <DrawerItemList {...props} />
+      <View style={styles.logoutButtonContainer}>
+        <Button
+          title="Logout"
+          onPress={() => {
+            logout();
+          }}
+          color="#c00"
+        />
+      </View>
+    </DrawerContentScrollView>
+  );
+}
+
+function AppDrawerNavigator() {
+  return (
+    <Drawer.Navigator
+      drawerContent={props => <CustomDrawerContent {...props} />}
+      screenOptions={{
+         headerShown: true,
+         headerTitle: '',
+         headerStyle: {
+           height: 100,
+         }
+      }}
+    >
+      <Drawer.Screen 
+        name="WorkoutInput" 
+        component={WorkoutInputScreen} 
+        options={{ 
+          title: 'Workout Input', 
+        }} 
+      />
+      <Drawer.Screen 
+        name="MyProfile" 
+        component={ProfileInfoScreen} 
+        options={{ 
+          title: 'My Profile', 
+        }} 
+      />
+      <Drawer.Screen 
+        name="DifficultyScale" 
+        component={DifficultyScaleScreen} 
+        options={{ 
+          title: 'Difficulty Scale', 
+        }} 
+      />
+      <Drawer.Screen 
+        name="MetricsDashboard" 
+        component={MetricsDashboardScreen} 
+        options={{ 
+          title: 'Metrics Dashboard', 
+        }} 
+      />
+    </Drawer.Navigator>
+  );
+}
+
+function AuthFlowStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Auth" component={AuthScreen} />
+      <Stack.Screen name="Verification" component={VerificationScreen} />
+      <Stack.Screen name="ProfileSetup" component={ProfileInfoScreen} />
+    </Stack.Navigator>
+  );
+}
 
 export default function AppNavigator() {
   const { refreshToken, isLoading, logout, userEmail } = useAuth();
@@ -24,8 +98,7 @@ export default function AppNavigator() {
             logout();
           }
         } catch (error) {
-          console.error('Validation error:', error);
-          logout();
+          logout(); 
         }
       }
     };
@@ -40,22 +113,15 @@ export default function AppNavigator() {
     );
   }
 
-  return (
-    <Stack.Navigator>
-      {refreshToken == null ? (
-        <>
-          <Stack.Screen name="Auth" component={AuthScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="Verification" component={VerificationScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="Profile" component={ProfileInfoScreen} options={{ headerShown: false }} />
-        </>
-      ) : (
-        <>
-          <Stack.Screen name="WorkoutInput" component={WorkoutInputScreen} options={{ title: 'Workout Input' }} />
-          <Stack.Screen name="Profile" component={ProfileInfoScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="DifficultyScale" component={DifficultyScaleScreen} options={{ title: 'Difficulty Scale' }} />
-          <Stack.Screen name="MetricsDashboard" component={MetricsDashboardScreen} options={{ title: 'Metrics Dashboard' }} />
-        </>
-      )}
-    </Stack.Navigator>
-  );
+  return refreshToken == null ? <AuthFlowStack /> : <AppDrawerNavigator />;
 }
+
+const styles = StyleSheet.create({
+  logoutButtonContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderTopWidth: 1,
+    borderTopColor: '#ccc',
+    marginTop: 10,
+  },
+});
